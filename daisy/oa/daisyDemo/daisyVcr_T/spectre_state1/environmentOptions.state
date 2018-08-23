@@ -1,0 +1,26 @@
+(envOpts analysisOrder) ("dc")
+(envOpts autoDisplay) t
+(envOpts cmd64bit) nil
+(envOpts cpfIsVMSEnabled) t
+(envOpts emLayerMap) ""
+(envOpts emTechFile) ""
+(envOpts emirEnable) nil
+(envOpts emirEnable_static) nil
+(envOpts emirSumList) nil
+(envOpts enableArclength) nil
+(envOpts enableNoiseRefactor) nil
+(envOpts firstRun) nil
+(envOpts lsusp) nil
+(envOpts macroModelEnable) nil
+(envOpts paramRangeCheckFile) ""
+(envOpts pllPlugin) ""
+(envOpts pllWizardinfo) ""
+(envOpts printComments) (nil nil)
+(envOpts restart) ""
+(envOpts savestate) ""
+(envOpts setTopLevelAsSubckt) nil
+(envOpts sst2usecolon) nil
+(envOpts stopViewList) ("spectre")
+(envOpts switchViewList) ("spectre" "spice" "cmos_sch" "cmos.sch" "schematic" "extracted" "veriloga" "verilogams" "ams" "ahdl")
+(envOpts userCmdLineOption) ""
+(envOpts vcoType) ""

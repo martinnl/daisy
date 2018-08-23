@@ -1,0 +1,17 @@
+// VerilogA for work_jacobw, daisyFlickerNoise, veriloga
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module daisyFlickerNoise(vp, vn);
+
+output vp, vn;
+electrical vp, vn;
+
+parameter real pwr = 1.0;
+parameter real expo = 1.0;
+
+analog begin
+       V(vp, vn) <+ flicker_noise( pwr, expo);
+end
+endmodule

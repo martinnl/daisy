@@ -1,0 +1,285 @@
+// VerilogA for oTFT 2.04.01, veriloga
+// Citation/Acknowledgment text: 
+// O. Marinov, "Verilog-A Implementation of the Compact Model 'oTFT' for Organic Thin-Film Transistors", Nano-Engineered Electronic Device Simulation Node (NEEDS), oTFT ver. 2.04.01, May 2015
+// https://nanohub.org/groups/needs/compact_models 
+// Revision history:
+// Implemented on 24 April 2015 by O. Marinov
+// Modified on  7 May 2015 by O. Marinov (comments in code enhanced, monitor voltage drop on both contacts added)
+// Modified on 14 May 2015 by O. Marinov (monitor commented, to prepare the code for release)
+// Modified on 14 June 2015 by O. Marinov (redundant electrical nodes GTS and GTD are removed, since the effective overdrive voltages are in variables VGTS and VGTD)
+
+/* --------------------------------------------------------------------------------------------------------------
+Copyright @ 2015 Ognian Marinov.
+ 
+The terms under which the software and associated documentation (the Software) is provided are as the following:
+  
+The Software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the Software or the use or other dealings in the Software.
+ 
+Ognian Marinov grants, free of charge, to any users the right to modify, copy, and redistribute the Software, both within the user's organization and externally, subject to the following restrictions:
+ 
+1. The users agree not to charge for the code itself but may charge for additions, extensions, or support.
+ 
+2. In any product based on the Software, the users agree to acknowledge the Research Group that developed the software. This acknowledgment shall appear in the product documentation.
+ 
+3. The users agree to obey all U.S. Government restrictions governing redistribution or export of the software.
+ 
+4. The users agree to reproduce any copyright notice which appears on the software on any copy or modification of such made available to others.
+ 
+Agreed to by 
+Ognian Marinov
+25 April 2015
+-------------------------------------------------------------------------------------------------------------- */
+
+/* Summary
+The oTFT compact models are aimed to support the bias enhancement of the charge carrier mobility and the significant contact effect in organic thin-film transistors (OTFTs). 
+
+The current version 2.04.01 of the oTFT compact model level 2 also supports other effects, such as channel conductance modulation (analogous to the channel length modulation in MOS transistors) and Ohmic and non-linear leakages. Quasi-static charge sub-model supports frequency and temporal response by AC and transient simulations.
+
+The model is with default values of parameters for organic thin-film transistors, but otherwise, the oTFT models are also applicable to other thin-film transistors (TFTs). Just the model parameters are with other values.
+
+The oTFT models are mirror of the TFT structure.  In the TFT structure and oTFT model, one distinguishes an intrinsic TFT between intrinsic nodes GI, SI, DI, and the intrinsic TFT is connected to the device terminals (gate G, source S, drain D) by contacts of significant impacts. Conceptually, the oTFT models are arranged so that the sub-model components can be changed, replaced, removed or upgraded, as the needs evolve.
+
+The oTFT models are hierarchical. The top hierarchical level is module oTFT, in which there are rails for interconnection of the sub-models and instantiations of the sub-models between the rails. One rail is with the device terminals G,S,D and another rail is with the internal nodes GI,SI,DI. There is also a control rail with overdrive voltages VGTS=(VG-VT-VS) and VGTD=(VG-VT-VD) at the channel ends of the intrinsic TFT. In the current Verilog-A code, there is a rail with nodes testGND, testSIGNAL for monitoring of internal quantities.
+
+The advantages of the hierarchical structure are several, but perhaps the most practical advantage is that the sub-models are simple, and well tied to diverse physical interpretations. Therefore, the oTFT model can be managed by researches far from the field of compact modeling and semiconductors, e.g., researchers in chemistry. 
+The oTFT model is arranged so that the different effects can be suppressed by setting model parameters to specific values, usually, equal to zero.
+
+The current version "oTFT 2.04.01" of the oTFT compact models is based on the following publications:
+[1]   O. Marinov, M. J. Deen, U. Zschieschang, H. Klauk, "Organic Thin-Film Transistors: Part I-Compact DC Modeling", IEEE Trans. Electron Devices, 56(12), 2952-2961, 2009 ; DOI: 10.1109/TED.2009.2033308            
+[2]   M. J. Deen, O. Marinov, U. Zschieschang, H. Klauk, "Organic Thin-Film Transistors: Part II-Parameter Extraction", IEEE Trans. Electron Devices, 56(12), 2962-2968, 2009 ; DOI: 10.1109/TED.2009.2033309            
+[3]   O. Marinov, M. J. Deen, J. Tejada, B. Iniguez, "Impact of the Fringing Capacitance at the Back of Thin-Film Transistors", Organic Electronics, 12(6), 936-949, 2011 ; DOI: 10.1016/j.orgel.2011.02.020            
+[4]   O. Marinov, M. J. Deen, "Quasistatic Compact Modelling of Organic Thin-Film Transistors", Organic Electronics, 14(1), 295-311, 2013 ;  DOI: 10.1016/j.orgel.2012.10.031            
+[5]   O. Marinov, M. J. Deen, C. Feng, Y. Wu, "Precise Parameter Extraction Technique for Organic Thin-Film Transistors Operating in the Linear Regime", Journal of Applied Physics, 115(3), 034506, 2014 ; DOI: 10.1063/1.4862043            
+[6]   O. Marinov, "Compact Models for Organic Thin-Film Transistors: Similarities, Differences, and Principles and Philosophy behind the Models", unpublished reviews and derivations, 127 pages, 2010
+
+Several adjustments in the equations from these publications have been made to ensure wide range of bias voltages and to avoid numerical problems, such as division by zero and discontinuity of derivatives. 
+
+The suppression of the sub-models is by the following settings, which can be made by instantiation of the oTFT model in circuits:
+
+Set gamma = 0 to suppress bias enhancement of mobility
+Set eB=0 to suppress channel modulation model
+Set eBleak=0 and RBS=10.0e30 (or larger) to suppress the leakage sub-model
+Set RC=1 and RCmax=0 to suppress the contact resistance model
+Set selectQS=0 to suppress quasi-static capacitances
+Set LOV=0 to suppress overlap capacitances between gate conductor and drain/source terminals
+Set eBov=0 to suppress the geometric capacitance between drain and source terminals
+
+If only the G,S,D terminals of the TFT are desired (e.g., for circuit simulation), then shorten the list of terminals by the definition of the oTFT module - see below
+*/
+
+
+/* =================== Begin of the Verilog-A code of compact model "oTFT" ========================================= */
+`include "constants.vams"
+`include "disciplines.vams"
+
+
+// Uncomment one of the following three lines, in order to have the oTFT model with reduced access nodes by instantiation.
+ 
+module oTFT(G,S,D); //The simplest 3-terminal oTFT model, only with nodes G,S,D for gate, source and drain terminals, respectively (use for circuit simulations)
+// module oTFT(G,S,D,GI,SI,DI); // oTFT model with terminal and intrinsic nodes available (no test terminals for inspection of internal quantities of the model)
+// module oTFT(G,S,D,testGND,testSIGNAL); //oTFT motel with terminal and test nodes available (change the end of the code to select and route quantity to the test terminals)
+
+//module oTFT(G,S,D,GI,SI,DI,testGND,testSIGNAL); // oTFT model with all nodes available (for research and troubleshooting). Comment this line, if one of the above three lines is uncommented.
+   parameter real version_oTFT = 2.0401; // oTFT model version = 2.04.01
+
+   electrical G,D,S; // terminals of the TFT for connection in circuits
+   electrical GI,DI,SI; // internal terminals of the TFT channel, for inspection only
+   electrical virtualNode; // virtual node for summing capacitive currents of the quasi-static model. The node is grounded, since the sum of currents to this node is zero +/- numerical errors
+   
+   electrical testGND, testSIGNAL; // test nodes for monitoring, isolated from the oTFT model. See and modify end of the code to select and route quantity to the test terminals
+
+   parameter integer np=+1 from [-1:1] exclude 0; //TFT polarity, np=+1 for n-type TFT, np=-1 for p-type TFT
+   parameter real W=100.0e-6 from (0:inf); // channel width in [m] (default W=100um)
+   parameter real L=10.00e-6 from (0:inf); // channel length in [m] (default L=10um)
+   parameter real CI=0.00035 from [0:inf); // unit-area capacitance of the gate dielectric in [F/m^2];  0.00035F/m^2 = 35nF/cm^2 (default, 100nm SiO2) 
+   parameter real VT=0 from (-inf:inf); // threshold voltage in [V] with its polarity (default VT=0 V)
+   parameter real uo=0.1e-4 from (0:inf); // (low-field) mobility in [m^2/Vs] at gate overdrive Vgamma=1V=np*(VGgamma-VT). Default uo=0.1e-4 m^2/Vs=0.1 cm^2/Vs.
+   parameter real Vgamma=1.0 from (0:inf); // Gate overdrive voltage in [V] for uo. Default, Vgamma = 1.0 V.
+   parameter real gamma=0.6 from [0:inf); // Mobility enhancement factor [numerical exponent]. Default, gamma=max(0,2*To/T-2)=0.6, for To~400K and T~300K.
+   
+   parameter real VSS=1.0 from (0:inf); // sub-threshold slope voltage in [V], VSS[V/Np]=dV/d(ln(ID))= 0.43(gamma+2)V/dec = V/dec for gamma=0.33.
+   
+   
+   // parameters for terminal to channel contacts
+   parameter real RC=100.0e3 from (0:inf); // minimum contact resistance at one contact (to the channel)
+   parameter real RCmax=300.0e3 from [0:inf); // elevation of contact resistance at low currents. Typically, RCmax=3*RC. RCmax=0 for constant resistance=RC.
+   parameter real ICmax=1e-9 from (0:inf); // max current for max contact resistance of value=(RC+RCmax). Typically, ICmax is in nA-range.
+   parameter real nIC=0.75 from [0.125:4]; // reduction exponent for RCmax. Meaningful values: nIC=0.5=SCLC; nIC=1=constant voltage drop.
+   
+   parameter real RGmin=1.0 from (0:inf); // negligible gate contact resistance. 
+   // Unlikely necessary, but one can increase RGmin in kOhm-MOhm range to introduce a pole in the frequency response of the transconductance gm=dIDS/dVGS
+   
+   
+   // parameters for channel modulation
+   parameter integer nSCLC=4 from [4:5] exclude 5; // Selector for channel modulation model. nSCLC=4 is only implemented: gamma model with CL=eB*eo/pi/L
+   parameter real eB=2 from [0:inf); //relative permittivity of the medium in the back of the semiconducting film, eB~2, for channel modulation.
+   `define CL  eB * `P_EPS0 / `M_PI / L 
+   //CL=eB*eo/pi/L, fringing capacitance in the back of the semiconducting film, eB~2
+   
+   // parameters for leakage
+   parameter real eBleak=0.5 from [0:inf); //relative permittivity of the medium in the back of the semiconducting film, eBleak~0.5 ~ (eB~2)/4, for leakage.
+   // eBleak is used to calculate fringing capacitance CLL=eBleak*eo/pi/L in the back of the semiconducting film for leakage.
+   `define CLL  eBleak * `P_EPS0 / `M_PI / L
+   parameter real VTL=0 from (-inf:inf); // threshold voltage in [V] with its polarity for leakage, ideally VTL=VT (default VTL=0 V)
+   parameter real RBS=10.0e12 from (0:inf); // [Ohm/square] Sheet resistance of the bulk of the semiconducting film, for Ohmic leakage
+   `define Vmin 10.0e-6
+   //Vmin [V] should be about 2-4 times the absolute tolerance for voltage of the simulator
+   
+   
+   // Quasi-static model parameters.
+   // The quasi-static model is for static charges, not for capacitances. Geometrical (overlap) capacitances are added.
+   // In principle, DC parameters should fully determine the quasi-static model. For convenience, constants are defined
+   `define CG0 W*L*CI
+   // CG0 [F] is the gate dielectric capacitance over the entire channel area of the TFT. CG0="CG zero"
+   parameter integer selectQS=1 from [0:1]; // selectQS=0 suppresses the quasi-static capacitances. The quasi-static charges are still calculated.
+   
+   // Overlap capacitances (usually dominate over quasi-static and other capacitances in TFT)
+   parameter real LOV=30.0e-6 from [0:inf); // Geometrical overlap of gate conductor with drain/source contact pad. LOV is approximately the length of the pads perpendicular to channel width W
+   `define COV CI*W*LOV
+   // COV=CI*W*LOV [F] = Overlap capacitance between gate conductor and drain/source contact pad. These COV are the dominant capacitances in TFT, since LOV>(2-3)L.
+   parameter real eBov=1 from [0:inf); //relative permittivity of the medium in the back of the semiconducting film for geometrical capacitance between drain and source terminals, eBov~1 ~ (eB~2)/2.
+   `define CDSOV W * 2 * eBov * `P_EPS0 / `M_PI
+   // CDSOV [F] is geometrical capacitance between drain and source contact pads. It is small, not exceeding twice the fringing capacitance at the "back" of the semiconducting film 
+   
+   // variables
+   real VGTS, VGTD; // for generic TFT charge drift DC model, etc. VGTS~np*(VG-VT-VS) and VGTD~np*(VG-VT-VD) are overdrive voltages at source and drain ends of the intrinsic channel of the TFT
+   real VSSS, VSSD; // sub-threshold slope voltage for VGTS and VGTD. In sub-threshold regime VSSS=VSSD=VSS. Above threshold, VSSS=VSS+VGTS/32 and VSSD=VSS+VGTD/32, to ensure no overflow of exp(VGT_/VSS_), _=S or D
+   real IDSgen; // Channel current per the generic TFT charge drift DC model
+   real numerator, denominator, fDeltaID; // for channel modulation
+   real VSSSLF, VGTSLF, VSSDLF, VGTDLF; // VSS_ and VGT_for forward leakage diode. (See above VGTS, VGTD, VSSS and VSSD)
+   real VSSSLR, VGTSLR, VSSDLR, VGTDLR; // VSS_ and VGT_for reverse leakage diode. (See above VGTS, VGTD, VSSS and VSSD)
+   real contactIC, contactVC; // current and voltage across one contact of drain/source terminals
+   real QG,QS,QD; // quasi-static charges of gate, source and drain terminals
+   real ksiS, ksiD, ksiG; // normalized overdrive voltages for quasi-static charges
+   real den, numS, numD; // denominator and numerators of the normalized functions of QS and QD
+   
+   analog begin
+      
+      /* ============ Generic TFT charge drift DC model ============ */
+      
+      // Source overdrive voltage
+      VSSS = sqrt(pow(VSS,2) + pow((np*(V(GI) - VT - V(SI)) + abs(V(GI) - VT - V(SI)))/64,2)); // To ensure VGT_/VSS_ <32, so that not overflowing exp(VGT_/VSS_) at high bias and small VSS
+      VGTS = VSSS * ln(1+exp(np*(V(GI) - VT - V(SI))/VSSS)); // Source overdrive voltage
+      
+      // Drain overdrive voltage
+      VSSD = sqrt(pow(VSS,2) + pow((np*(V(GI) - VT - V(DI)) + abs(V(GI) - VT - V(DI)))/64,2)); // To ensure VGT_/VSS_ <32, so that not overflowing exp(VGT_/VSS_) at high bias and small VSS
+      VGTD = VSSD * ln(1+exp(np*(V(GI) - VT - V(DI))/VSSD)); // Drain overdrive voltage
+      
+      // Generic TFT charge drift DC model
+      I(DI,SI) <+ np*W/L*uo/pow(Vgamma,gamma)*CI*(pow(VGTS,gamma+2)-pow(VGTD,gamma+2))/(gamma+2); // Generic TFT charge drift DC model
+
+      
+      /* ============ Contact model ============ */
+      // Connect TFT terminals to intrinsic nodes through contact resistances. The model for contact resistance is R(I)=RC+Rmax*(ICmax/(ICmax+|I|))^nIC
+      V(G,GI)  <+ RGmin*I(G,GI);  // negligible gate contact resistance
+      V(G,GI)  <+ 0    *I(G,GI) * pow(ICmax/(ICmax + abs(I(G,GI))),nIC);  // non-linear gate contact resistance is set to zero (ignored)
+      V(S,SI)  <+ RC  * I(S,SI);  // constant (minimum) source contact resistance
+      V(S,SI)  <+ RCmax*I(S,SI) * pow(ICmax/(ICmax + abs(I(S,SI))),nIC);  // non-linear source contact resistance
+      V(D,DI)  <+ RC  * I(D,DI);  // constant (minimum) drain contact resistance
+      V(D,DI)  <+ RCmax*I(D,DI) * pow(ICmax/(ICmax + abs(I(D,DI))),nIC);  // non-linear drain contact resistance
+      
+      /* ============ Channel modulation ============ */
+      I(DI,SI) <+ np*W/L*uo/pow(Vgamma,gamma)*6*`CL*(pow(VGTS,gamma+2)-pow(VGTD,gamma+2))/(gamma+2); // first component of channel modulation current
+      I(DI,SI) <+ W/L*uo/pow(Vgamma,gamma)*6*`CL*(V(DI)/2+V(SI)/2-V(GI)+VT)*(pow(VGTS,gamma+1)-pow(VGTD,gamma+1))/(gamma+1); // second component of channel modulation current
+      numerator = abs(pow(VGTS,3+2*gamma)-(3+2*gamma)*pow(VGTS,2+gamma)*pow(VGTD,1+gamma)+(3+2*gamma)*pow(VGTS,1+gamma)*pow(VGTD,2+gamma)-pow(VGTD,3+2*gamma));
+      denominator = abs(pow(VGTS,2+gamma)-pow(VGTD,2+gamma)) + pow((1+3)*`Vmin,2+gamma); // small voltage (1+3)*`Vmin~40uV added to avoid division on zero
+      fDeltaID = numerator/denominator;
+      I(DI,SI) <+ W/L*uo/pow(Vgamma,gamma)*6*`CL*(V(DI)-V(SI))*fDeltaID/2/(gamma+1)/(3+2*gamma); // third component of channel modulation current
+      
+      /* ============ Channel leakage ============ */
+      // The leakage and off currents between drain and source terminals are defined as currents independent of gate bias
+      // The leakage model is based on back-film capacitance CLL=eBleak*eo/pi/L, eBleak~0.5 ~ (eB~2)/4
+      // resulting in anti-parallel connection of two TFT diodes for leakage due to CLL. The "gate" capacitance of these two leakage TFT is CI=6CLL
+      // Resistor RBS*L/W is also added for Ohmic leakage between drain and source, due to conductance of the bulk of the semiconducting film.
+      
+      // Ohmic (linear) leakage
+      I(D,S) <+ V(D,S) * W / L / RBS; // Ohmic leakage in the bulk of the semiconducting film, between D and S
+      //I(DI,SI) <+ V(DI,SI) * W / L / RBS; // Ohmic leakage in the bulk of the semiconducting film, between DI and SI
+      
+      // Forward leakage diode
+      VSSSLF = sqrt(pow(VSS,2) + pow((np*(V(D) - VTL - V(S)) + abs(V(D) - VTL - V(S)))/64,2)); // To ensure VGT_/VSS_ <32, so that not overflowing exp(VGT_/VSS_) at high bias and small VSS
+      VGTSLF = VSSSLF * ln(1+exp(np*(V(D) - VTL - V(S))/VSSSLF)); // Source overdrive voltage for forward leakage diode
+      VSSDLF = sqrt(pow(VSS,2) + pow((np*(V(D) - VTL - V(D)) + abs(V(D) - VTL - V(D)))/64,2)); // To ensure VGT_/VSS_ <32, so that not overflowing exp(VGT_/VSS_) at high bias and small VSS
+      VGTDLF = VSSDLF * ln(1+exp(np*(V(D) - VTL - V(D))/VSSDLF)); // Drain overdrive voltage for forward leakage diode
+      I(D,S) <+ np*W/L*uo/pow(Vgamma,gamma)*6*`CLL*(pow(VGTSLF,gamma+2)-pow(VGTDLF,gamma+2))/(gamma+2); // TFT generic for forward leakage diode, between D and S
+      //I(DI,SI) <+ np*W/L*uo/pow(Vgamma,gamma)*6*`CLL*(pow(VGTSLF,gamma+2)-pow(VGTDLF,gamma+2))/(gamma+2); // TFT generic for forward leakage diode, between DI and SI
+      
+      // Reverse leakage diode
+      VSSSLR = sqrt(pow(VSS,2) + pow((np*(V(S) - VTL - V(S)) + abs(V(S) - VTL - V(S)))/64,2)); // To ensure VGT_/VSS_ <32, so that not overflowing exp(VGT_/VSS_) at high bias and small VSS
+      VGTSLR = VSSSLR * ln(1+exp(np*(V(S) - VTL - V(S))/VSSSLR)); // Source overdrive voltage for reverse leakage diode
+      VSSDLR = sqrt(pow(VSS,2) + pow((np*(V(S) - VTL - V(D)) + abs(V(S) - VTL - V(D)))/64,2)); // To ensure VGT_/VSS_ <32, so that not overflowing exp(VGT_/VSS_) at high bias and small VSS
+      VGTDLR = VSSDLR * ln(1+exp(np*(V(S) - VTL - V(D))/VSSDLR)); // Drain overdrive voltage for reverse leakage diode
+      I(D,S) <+ np*W/L*uo/pow(Vgamma,gamma)*6*`CLL*(pow(VGTSLR,gamma+2)-pow(VGTDLR,gamma+2))/(gamma+2); // TFT generic for reverse leakage diode, between D and S
+      //I(DI,SI) <+ np*W/L*uo/pow(Vgamma,gamma)*6*`CLL*(pow(VGTSLR,gamma+2)-pow(VGTDLR,gamma+2))/(gamma+2); // TFT generic for reverse leakage diode, between DI and SI
+      
+      
+      /* ============ Quasi-static charge model ============ */
+      //Generic quasi-static charge model of the TFT for computer simulators. QG, QS and QD are the quasi-static charges of gate, source and drain terminals
+      
+      // normalized overdrive voltages: ksiS = VGTS/(VGTS+VGTD); ksiD = VGTD/(VGTS+VGTD);
+      ksiS = sqrt(pow(VGTS,2)+pow(`Vmin,2)) / (sqrt(pow(VGTS,2)+pow(`Vmin,2))+sqrt(pow(VGTD,2)+pow(`Vmin,2))); // normalized overdrive voltages for source
+      ksiD = sqrt(pow(VGTD,2)+pow(`Vmin,2)) / (sqrt(pow(VGTS,2)+pow(`Vmin,2))+sqrt(pow(VGTD,2)+pow(`Vmin,2))); // normalized overdrive voltages for drain
+      ksiG = ksiS + ksiD; // this quantity should be always equal to unity. Not used, therefore
+      
+      // den, numS, numD; // denominator and numerators of the normalized functions of QS and QD
+      den = pow((pow(ksiS,(2+gamma))/(2+gamma)-pow(ksiD,(2+gamma))/(2+gamma)),2); // denominator of the normalized functions of QS and QD
+      numS = (pow(ksiS,5+2*gamma)/(5+2*gamma))/(2+gamma)-(pow(ksiS,3+gamma)/(3+gamma))*(pow(ksiD,2+gamma)/(2+gamma))+(pow(ksiD,5+2*gamma)/(5+2*gamma))/(3+gamma); // numerator of the normalized function of QS
+      numD = (pow(ksiS,5+2*gamma)/(5+2*gamma))/(3+gamma)-(pow(ksiS,2+gamma)/(2+gamma))*(pow(ksiD,3+gamma)/(3+gamma))+(pow(ksiD,5+2*gamma)/(5+2*gamma))/(2+gamma); // numerator of the normalized function of QD
+    
+      // real QG,QS,QD; // quasi-static charges of gate, source and drain terminals
+      QS = np*(-`CG0)*(VGTS+VGTD)*sqrt((pow(numS,2)+pow(((1+ksiS)*`Vmin/6),2))/(pow(den,2)+pow(`Vmin,2))); // quasi-static charge of source terminal
+      QD = np*(-`CG0)*(VGTS+VGTD)*sqrt((pow(numD,2)+pow(((1+ksiD)*`Vmin/6),2))/(pow(den,2)+pow(`Vmin,2))); // quasi-static charge of drain  terminal
+      QG = -(QS+QD); // The quasi-static charge of gate terminal is inverted sum of the quasi-static charges of source and drain terminals (charge conservation)
+      
+      // (capacitive) currents due to variation of quasi-static charges. 
+      // Currents are summed to virtual node "virtualNode".
+      // The sum of currents is zero, but numerical rounding can cause non-zero net flow of currents into the virtualNode. Therefore, the virtualNode is grounded.
+      I(G,virtualNode) <+ ddt(QG)*min(1,selectQS); // (capacitive) current in gate terminal due to variation of the gate quasi-static charge
+      I(S,virtualNode) <+ ddt(QS)*min(1,selectQS); // (capacitive) current in source terminal due to variation of the source quasi-static charge
+      I(D,virtualNode) <+ ddt(QD)*min(1,selectQS); // (capacitive) current in drain terminal due to variation of the drain quasi-static charge
+      V(virtualNode) <+ 0; // ground the virtual node
+      
+      /* ============ Overlap capacitances ============ */
+      // Overlap capacitances usually dominate over quasi-static and other capacitances in TFT
+      // COV=CI*W*LOV [F] = Overlap capacitance between gate conductor and drain/source contact pad. These COV are the dominant capacitances in TFT, since LOV>(2-3)L.
+      I(G,S) <+ `COV * ddt(V(G)-V(S)); // Gate-source overlap capacitance
+      I(G,D) <+ `COV * ddt(V(G)-V(D)); // Gate-grain overlap capacitance
+      // CDSOV=W*2*eBov*eo/pi ~ 2*`CL*W*L [F] is geometrical capacitance between drain and source contact pads. It is small, not exceeding twice the fringing capacitance at the "back" of the semiconducting film
+      I(D,S) <+ `CDSOV * ddt(V(D)-V(S)); // Drain-source overlap capacitance (usually negligible)
+      
+      
+      /* ============ Monitor of quantities ============ */
+      // If you wish monitoring internal quantities in the oTFT model, then use test nodes testGND and testSIGNAL. Examples are given below.
+      // The test terminals are available, if instantiating the oTFT model with the test nodes, e.g.
+      //     module oTFT(G,S,D,GI,SI,DI,testGND,testSIGNAL); // oTFT model with all nodes available
+      //     module oTFT(G,S,D,testGND,testSIGNAL); // oTFT model with terminal and test nodes available
+      // The test terminals can be used pushing current from testGND to testSIGNAL. Connect testGND to circuit ground. 
+      // Connect 1 Ohm resistor between testSIGNAL and ground and monitor the current through the resistor.
+      // (Missing to connect testGND and testSIGNAL to a circuit, it will possibly force the simulator to place gmin to these nodes, or ground the nodes. Do not care, because
+      //  the test nodes are isolated from the model, and the oTFT model will properly operate.)
+      
+      I(testGND, testSIGNAL) <+ 0; // The default is monitoring nothing. Uncomment one of the following lines to monitor one of the quantities in the oTFT model.
+      
+      // monitor contact voltage drop
+      //I(testGND, testSIGNAL) <+ (+np*(V(SI)-V(S))); // monitor voltage magnitude on source contact, converted to current, 1A=1V. It duplicates monitoring of potentials by all-node instantiation oTFT(G,S,D,GI,SI,DI...)
+      //I(testGND, testSIGNAL) <+ (-np*(V(DI)-V(D))); // monitor voltage magnitude on drain  contact, converted to current, 1A=1V. It duplicates monitoring of potentials by all-node instantiation oTFT(G,S,D,GI,SI,DI...)
+      //I(testGND, testSIGNAL) <+ (V(SI)-V(S))-(V(DI)-V(D)); // monitor sum of voltage drops on both source and train contacts, converted to current, 1A=1V.
+
+
+      // monitor quasi-static charges
+      // I(testGND, testSIGNAL) <+ np*(+QG/(`CG0*VGTS)); // = (2+gamma)/(3+gamma) = 0.72222 for gamma=0.6 in saturation regime
+      // I(testGND, testSIGNAL) <+ np*(-QS/(`CG0*VGTS)); // = (2+gamma)/(5+2gamma) = 0.41935 for gamma=0.6 in saturation regime
+      // I(testGND, testSIGNAL) <+ np*(-QD/(`CG0*VGTS)); // = (2+gamma)^2/[(2+gamma)*(5+2gamma)] = 0.30287 for gamma=0.6 in saturation regime
+
+      
+      // monitor quasi-static capacitances. Connect an AC source with unit amplitude (A=1) and frequency (f, as set by AC simulation) at one (x) of the TFT terminals, x=gate, drain or source.
+      // I(testGND, testSIGNAL) <+ ddt(QG)/(`CG0 * `M_TWO_PI); // normalized CGx/CG0 * f : gate capacitance due to voltage variation of x-terminal, x=gate, drain or source, depending where the AC source is.
+      // I(testGND, testSIGNAL) <+ ddt(QS)/(`CG0 * `M_TWO_PI); // normalized CSx/CG0 * f : source capacitance due to voltage variation of x-terminal, x=gate, drain or source, depending where the AC source is.
+      // I(testGND, testSIGNAL) <+ ddt(QD)/(`CG0 * `M_TWO_PI); // normalized CDx/CG0 * f : drain capacitance due to voltage variation of x-terminal, x=gate, drain or source, depending where the AC source is.
+      
+      // I(testGND, testSIGNAL) <+ I(virtualNode); // monitor numerical error for (capacitive) currents in the quasi-static model. Ideally, I(virtualNode) = ddt(QG) + ddt(QS) + ddt(QD) = 0.
+      
+   
+   end // of "analog begin"
+
+endmodule // module oTFT;

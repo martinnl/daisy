@@ -1,0 +1,9 @@
+// VerilogA for daisy, oTFT, veriloga
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module oTFT;
+
+
+endmodule
