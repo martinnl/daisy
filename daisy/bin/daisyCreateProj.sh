@@ -5,6 +5,9 @@
 # J Jacob Wikner (jacob.wikner@liu.se)
 #
 
+## 2018-08-23: Updated to PROJAREA and DAISYAREA is set
+## outside the script to make it more general. /MNL
+##
 ## 2011-05-27: Cleaned up a bit, removed the workarea 
 ## links and relied instead on the Projarea variable. 
 ## Further on, cleaned up the cds.lib generation to 
@@ -17,10 +20,17 @@ setenv PROJNAME $1        ## For example ANTIK
 setenv PROJPATH $HOME     ## Always saved in home directory
 
 # Shared project area
-setenv PROJAREA /site/edu/es/$PROJNAME
+if ! $?PROJAREA then
+  echo "DAISY:: PROJAREA HAS TO BE SET!"
+  exit
+endif
+
+if ! $?DAISYAREA then
+  echo "DAISY:: DAISYAREA HAS TO BE SET!"
+  exit
+endif
 
 setenv WORKAREA $PROJPATH/$PROJNAME
-setenv DAISYAREA /site/edu/es/DAISY/daisy
 
 mkdir -p $WORKAREA
 cd $WORKAREA

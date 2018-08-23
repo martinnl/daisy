@@ -1,7 +1,9 @@
 #!/bin/tcsh -f
 #
 # Project setup for the daisy cad environment
-# J Jacob Wikner 
+# J Jacob Wikner
+#
+# 2018-08-23: Retrive DAISYAREA from config
 #
 
 # Path to your local directory
@@ -16,8 +18,8 @@ setenv PROJAREA "$3"
 
 setenv WORKAREA "$PWD/$PROJPATH/$PROJNAME/"
 
-# Can this be dynamically retrieved
-setenv DAISYAREA /site/edu/es/DAISY/daisy
+# Get DAISYAREA from config
+source `basename $0`/bin/config.sh
 
 mkdir -p "$WORKAREA"
 
@@ -39,6 +41,7 @@ echo "$WORKAREA"
 ln -sf $DAISYAREA/cds/cdsinit     .cdsinit
 ln -sf $DAISYAREA/cds/cdsenv      .cdsenv
 ln -sf $DAISYAREA/cds/cdsplotinit .cdsplotinit
+ln -sf $DAISYAREA/cds/assura_tech.lib       
 ln -sf $DAISYAREA/oceanrc         .oceanrc
 ln -sf $DAISYAREA/data.reg 
 ln -sf $DAISYAREA/hdl.var
@@ -67,14 +70,17 @@ echo 'source $DAISYAREA/cshrc/tcshrc' >> "$HOME/.${PROJNAME}_rc"
 cd "$WORKAREA"
 
 # Link all the repos
-if (-e  "$PROJAREA/daisyProjSetup/info/daisyDdcs.txt") then 
-    foreach line (`cat $PROJAREA/daisyProjSetup/info/daisyDdcs.txt`)
-         echo "DAISY:: Adding $line to your $WORKAREA"
-	 ln -sf "$PROJAREA/$line"
-    end
-else
-    echo "DAISY: There is no daisyDdcs.txt file in your daisyProjSetup/info"
-endif
+# Changed 2015-06-08 /MNL
+$DAISYAREA/bin/daisyCreateDdcLinks.sh
+# Old code follows
+#if (-e  "$PROJAREA/daisyProjSetup/info/daisyDdcs.txt") then 
+#    foreach line (`cat $PROJAREA/daisyProjSetup/info/daisyDdcs.txt`)
+#         echo "DAISY:: Adding $line to your $WORKAREA"
+#	 ln -sf "$PROJAREA/$line"
+#    end
+#else
+#    echo "DAISY: There is no daisyDdcs.txt file in your daisyProjSetup/info"
+#endif
 
 
 # Run project specific setup

@@ -16,7 +16,8 @@ if ($#argv != 4) then
   exit
 endif
 
-setenv DAISYAREA /site/edu/es/DAISY/daisy
+# Get DAISYAREA from config
+source `basename $0`/bin/config.sh
 setenv PROJPATH $1
 setenv PROJNAME $2
 setenv GROUP $3
@@ -26,6 +27,9 @@ setenv PROJAREA ${PROJPATH}/${PROJNAME}
 set setuparea = ${PROJAREA}/daisyProjSetup
 setenv PDK_HOME ${DAISYAREA}/pdkSpecific/${PROCESS}
 
+# DEBUG
+echo $PDK_HOME
+echo $PROCESS
 # Create the project area
 umask 007
 mkdir -p ${PROJAREA}

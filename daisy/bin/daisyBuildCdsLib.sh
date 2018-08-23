@@ -6,8 +6,10 @@
 
 if ($# < 1) then
     set cdsName="cds.lib"
+    echo "Adding links to your cds.lib"
 else
     set cdsName="cds.testlib"
+    echo "Adding links to your cds.testlib"
 endif
 
 cd $PROJAREA/daisyProjSetup/$CDSDATABASE/

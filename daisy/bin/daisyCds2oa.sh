@@ -1,9 +1,5 @@
 #!/bin/csh -f
 
-#setenv libName "smartDustAdcLs"
-#setenv ddcName "smartDustAdcLs"
-#setenv cdsName "cds.lib"
-
 set ddcName=$1
 set libName=$2
 
@@ -22,9 +18,6 @@ mkdir -p $ddcOaPath
 cd $ddcOaPath
 cat $DAISYAREA/pdkSpecific/$CDSPROCESSNAME/oa/tech.lib >> $ddcOaPath/cds.lib
 cat $DAISYAREA/pdkSpecific/$CDSPROCESSNAME/cds/tech.lib >> $ddcCdsPath/$cdsName
-
-#echo "DEFINE cmos065 /sw/mentor/libraries/cmos065RF_v.522/DK_cmos065lpgp_RF_7m4x0y2z_2V51V8_5.2.2/DATA/LIB/lib/OpenAccess/cmos065" >> cds.lib
-#echo "DEFINE cmos065 /sw/mentor/libraries/cmos065RF_v.522/DK_cmos065lpgp_RF_7m4x0y2z_2V51V8_5.2.2/DATA/LIB/lib/cmos065" >> $ddcCdsPath/$cdsName
 
 cdb2oa  -ignorelocks -nodm -lib $libName  -cdslibpath   $ddcCdsPath/$cdsName  
 	
