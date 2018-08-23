@@ -7,7 +7,7 @@
 (loadi (strcat (getShellEnvVar "CDS_HOME") 
 	       "/tools/dfII/cdsuser/.cdsinit"))
 
-(printf "Loading Linkoping University init...\n")
+(printf "Loading Daisy init...\n")
 
 ;; Project dir should change more dynamically.
 

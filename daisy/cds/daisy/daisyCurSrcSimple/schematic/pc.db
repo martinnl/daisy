@@ -4,9 +4,9 @@ VcurrentProbeW
 VcurrentProbeWo
 #
 analogLib res symbol
-R6
 R5
 Rout
+R6
 #
 analogLib cccs symbol
 F2
