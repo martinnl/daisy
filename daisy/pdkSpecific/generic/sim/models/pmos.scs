@@ -1,0 +1,65 @@
+// This examples are copied from here and there on the internet. 
+// Use with care. Notice that for example the threshold voltages
+// are not "aligning" over the different models
+
+simulator lang=spice
+
+.model pmos1  pmos level=1 \
+    vto=-0.5 kp=8u  gamma=0.6 lambda=0.01 \
+    phi=0.6 pb=0.50 mjsw=0.25 cj=150u cjsw=400p \
+    cgbo=200p cgso=450p cgdo=350p ld=0.2u tox=20n mj=0.5 
+
+.MODEL pmos2 PMOS LEVEL=2 \ 
+       LD = 0.227236U TOX=417.000008E-10 NSUB=1.056124E+16 \
+       VTO=-0.937048 KP=1.731000E-05 GAMMA=0.715 PHI=0.6 UO=209 \
+        UEXP=0.23383 UCRIT=47509.9 DELTA=1.07179 VMAX=100000 \
+	XJ=0.250000U LAMBDA=4.391428E-02 NFS=3.27E+11 \
+	NEFF=1.001 NSS=1.000000E+10 TPG=-1.000000 RSH=72.960000 \ 
+	CGDO=2.822585E-10 CGSO=2.822585E-10 CGBO=5.292375E-10 \ 
+	CJ=3.224200E-04 MJ=0.584956 CJSW=2.979100E-10 \
+	MJSW=0.310807 PB=0.800000 
+
+.MODEL pmos3 PMOS LEVEL=3 \
+       TOX=5.7E-9 NSUB=1E17 GAMMA=0.6348369 PHI=0.7 VTO=-0.5536085 \
+       DELTA=0 UO=250 ETA=0 THETA=0.1573195 KP=5.194153E-5 \
+       VMAX=2.295325E5 KAPPA=0.7448494 RSH=30.0776952 NFS=1E12 TPG=-1 \
+       XJ=2E-7 LD=9.968346E-13 WD=5.475113E-9 CGDO=6.66E-10 \
+       CGSO=6.66E-10 CGBO=1E-10 CJ=1.893569E-3 PB=0.9906013 \
+       MJ=0.4664287 CJSW=3.625544E-10 MJSW=0.5 
+
+.model pmos49  pmos level=49 \
++ Tnom=27.0
++ nch=5.73068E+16 tox=1.00000E-08 xj=1.00000E-07
++ lint=8.195860E-08 wint=-1.821562E-07
++ vth0=-.86094574 k1=.341038 k2=2.703463E-02 k3=12.24589
++ dvt0=.767506 dvt1=.65109418 dvt2=-0.145
++ nlx=1.979638E-07 w0=1.1e-6
++ k3b=-2.4139039
++ vsat=60362.05 ua=1.348481E-09 ub=3.178541E-19 uc=1.1623e-10
++ rdsw=498.873 u0=137.2991 prwb=-1.2e-5
++ a0=.3276366
++ keta=-1.8195445E-02 a1=.0232883 a2=.9
++ voff=-6.623903E-02 nFactor=1.0408191 cit=4.994609E-04
++ cdsc=1.030797E-3
++ cdscb=2.84e-4
++ eta0=.0245072 etab=-1.570303E-03
++ dsub=.24116711
++ pclm=2.6813153 pdiblc1=4.003703E-02 pdiblc2=.00329051 
++ pdiblcb=-2.e-4
++ drout=.1380235 pscbe1=0 pscbe2=1.e-28
++ pvag=-.16370527
++ prwg=-0.001 ags=1.2
++ dvt0w=0.58 dvt1w=5.3e6 dvt2w=-0.0032
++ kt1=-.3 kt2=-.03 prt=76.4
++ at=33000
++ ute=-1.5
++ ua1=4.31E-09 ub1=7.61E-18 uc1=-2.378e-10
++ kt1l=0
++ wr=1 b0=1e-7 b1=1e-7 dwg=5e-8 dwb=2e-8 delta=0.015
++ cgdl=1e-10 cgsl=1e-10 cgbo=1e-10 xpart=0.0
++ cgdo=0.4e-9 cgso=0.4e-9
++ clc=0.1e-6
++ cle=0.6
++ ckappa=0.6
+
+simulator lang=spectre

@@ -1,0 +1,74 @@
+// This examples are copied from here and there on the internet. 
+// Use with care. Notice that for example the threshold voltages
+// are not "aligning" over the different models
+
+// They are used solely for educational purposes.
+
+//LEVEL=1 -> Shichman-Hodges
+//LEVEL=2 -> MOS2 (as described in [1])
+//LEVEL=3 -> MOS3, a semi-empirical model(see [1])
+//LEVEL=4 -> BSIM (as described in [3])
+//LEVEL=5 -> new BSIM (BSIM2; as described in [5])
+//LEVEL=6 -> MOS6 (as described in [2])
+
+simulator lang=spice
+.model nmos1  nmos level=1 \
+    vto=0.5  kp=16u gamma=1.3 lambda=0.005 \
+    phi=0.7 pb=0.80 mjsw=0.3  cj=300u cjsw=500p  \
+    cgbo=200p cgso=450p cgdo=350p ld=0.2u tox=20n mj=0.5 
+
+.MODEL nmos2 NMOS LEVEL=2 \ 
+       LD=0.250000U TOX=417.000008E-10 NSUB=6.108619E+14 \
+       VTO=0.825008 KP=4.919000E-05 GAMMA=0.172 PHI=0.6 UO=594 \
+       UEXP=6.682275E-02 UCRIT=5000 DELTA=5.08308 VMAX=65547.3 \ 
+       XJ=0.250000U LAMBDA=6.636197E-03 NFS=1.98E+11 NEFF=1 \
+       NSS=1.000000E+10 TPG=1.000000 RSH=32.740000 CGDO=3.10534E-10 \
+       CGSO=3.105345E-10 CGBO=3.848530E-10 CJ=9.494900E-05 \
+       MJ=0.847099 CJSW=4.410100E-10 MJSW=0.334060 PB=0.800000
+
+.MODEL nmos3 NMOS LEVEL=3 \ 
+       TOX=5.7E-9 NSUB=1E17 GAMMA=0.4317311 PHI=0.7 \
+       VTO=0.4238252 DELTA=0 UO=425.6466519 ETA=0 \
+       THETA=0.1754054 KP=2.501048E-4 VMAX=8.287851E4 \
+       KAPPA=0.1686779 RSH=4.062439E-3 NFS=1E12 \
+       TPG=1 XJ=3E-7 LD=3.162278E-11 WD=1.232881E-8 \
+       CGDO=6.2E-10 CGSO=6.2E-10 CGBO=1E-10
+       CJ=1.81211E-3 PB=0.5 MJ=0.3282553 CJSW=5.341337E-10 \ 
+       MJSW=0.5 
+
+.model nmos49  nmos level=49 \
++ Tnom=27.0
++ nch=1.024685E+17 tox=1.00000E-08 xj=1.00000E-07
++ lint=3.75860E-08 wint=-2.02101528644562E-07
++ vth0=.6094574 k1=.5341038 k2=1.703463E-03 k3=-17.24589
++ dvt0=.1767506 dvt1=.5109418 dvt2=-0.05
++ nlx=9.979638E-08 w0=1e-6
++ k3b=4.139039
++ vsat=97662.05 ua=-1.748481E-09 ub=3.178541E-18 uc=1.3623e-10
++ rdsw=298.873 u0=307.2991 prwb=-2.24e-4
++ a0=.4976366
++ keta=-2.195445E-02 a1=.0332883 a2=.9
++ voff=-9.623903E-02 nFactor=.8408191 cit=3.994609E-04
++ cdsc=1.130797E-04
++ cdscb=2.4e-5
++ eta0=.0145072 etab=-3.870303E-03
++ dsub=.4116711
++ pclm=1.813153 pdiblc1=2.003703E-02 pdiblc2=.00129051
++ pdiblcb=-1.034e-3
++ drout=.4380235 pscbe1=5.752058E+08 pscbe2=7.510319E-05
++ pvag=.6370527 prt=68.7 ngate=1.e20 alpha0=1.e-7 beta0=28.4
++ prwg=-0.001 ags=1.2
++ dvt0w=0.58 dvt1w=5.3e6 dvt2w=-0.0032
++ kt1=-.3 kt2=-.03
++ at=33000
++ ute=-1.5
++ ua1=4.31E-09 ub1=7.61E-18 uc1=-2.378e-10
++ kt1l=1e-8
++ wr=1 b0=1e-7 b1=1e-7 dwg=5e-8 dwb=2e-8 delta=0.015
++ cgdl=1e-10 cgsl=1e-10 cgbo=1e-10 xpart=0.0
++ cgdo=0.4e-9 cgso=0.4e-9
++ clc=0.1e-6
++ cle=0.6
++ ckappa=0.6
+
+simulator lang=spectre

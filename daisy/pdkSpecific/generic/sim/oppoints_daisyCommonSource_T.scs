@@ -1,0 +1,8 @@
+// Setup for testing the sweep of transistor parameters
+save Mload:gm
+save Mmirr:gm
+
+save Mdrive:region
+save Mdrive:gds
+save Mdrive:gm
+

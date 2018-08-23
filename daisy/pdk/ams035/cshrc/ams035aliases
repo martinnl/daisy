@@ -1,3 +1,0 @@
-alias cad 'cdwa; $PDK_HOME/bin/ams_cds'
-
-# vim: ft=tcsh
