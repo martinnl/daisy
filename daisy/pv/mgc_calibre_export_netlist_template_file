@@ -1,10 +1,26 @@
-;; (if (boundp 'cdlOutKeys)
-;;cdlOutKeys->incFILE =  (strcat (getShellEnvVar "PDK_HOME") 
-;;			       "/Calibre/lvs/source_added")
-			      
-cdlOutKeys->incFILE = (strcat (getShellEnvVar "WORKAREA") 
-			      "/daisy/pdkSpecific/" 
-			      (getShellEnvVar "CDSPROCESSNAME") 
-			      "/verification/source_added")
-cdlOutKeys->simViewList = (list  "auCdl" "cdl" "schematicLVS" "schematic")
-cdlOutKeys->simStopList = (list  "auCdl" "cdl")
+cdlOutKeys = list(nil
+	'simStopList               '("auCdl" "cdl")
+	'simViewList               '("auCdl" "cdl" "schematicLVS" "schematic")
+	'globalGndSig              ""
+	'globalPowerSig            ""
+	'shrinkFACTOR              0.0
+	'checkScale                "meter"
+	'diodeCheck                "none"
+	'capacitorCheck            "none"
+	'resistorCheck             "none"
+	'resistorModel             ""
+	'shortRES                  2000.0
+	'simNetlistHier            t
+	'pinMAP                    'nil
+	'displayPININFO            t
+	'checkLDD                  'nil
+	'incFILE                   (strcat (getShellEnvVar "PDK_HOME") "/pv/source_added")
+	'connects                  ""
+	'setEQUIV                  ""
+	'simRunDir                 (strcat (getShellEnvVar "VERAREA") "cellname/lvs/")
+	'hnlNetlistFileName        ""
+	'simSimulator              "auCdl"
+	'simViewName               "schematic"
+	'simCellName               ""
+	'simLibName                ""
+)

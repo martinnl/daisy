@@ -19,6 +19,7 @@ function [varargout]=esplot(varargin)
 %           'eps'       Encapsulated EPS level2 with preview tiff
 %           'fig'       Matlab figure.
 %           'png'       Portable Network Graphics
+%           'pdf'       Portable Description Format
 %           'jpeg'      Joint Photographic Experts Group
 %           'orgfig'    Saves the orginal fugure in Matlab fig format.  
 %
