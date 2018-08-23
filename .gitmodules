@@ -1,0 +1,3 @@
+[submodule "daisy/skill/daisyLayoutAssist"]
+	path = daisy/skill/daisyLayoutAssist
+	url = https://github.com/martinnl/daisyLayoutAssist
