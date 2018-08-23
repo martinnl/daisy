@@ -1,0 +1,5 @@
+daisy/bin/config.sh
+*.log
+*~
+*.swp
+*#
