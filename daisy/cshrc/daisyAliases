@@ -15,9 +15,15 @@
    alias  cds   'cd `cdp s \!*`'
    
    if ($CDSDATABASE == "cds") then
-      alias  cad   'cdwa; icfb -log $CDS_LOG_PATH/CDS.$USER.`date '+20%y%m%d'`.$HOST.log&'
+      alias  cad   'cdwa; icfb -nosplash -log $CDS_LOG_PATH/CDS.$USER.`date '+20%y%m%d'`.$HOST.log&'
    else   
-     alias  cad   'cdwa; virtuoso -log $CDS_LOG_PATH/CDS.$USER.`date '+20%y%m%d'`.$HOST.log&'
+      alias  cad   'cdwa; virtuoso -log $CDS_LOG_PATH/CDS.$USER.`date '+20%y%m%d'`.$HOST.log&'
+   endif
+
+   if ($CDSDATABASE == "cds") then
+      alias  cadr   'cdwa; icfb -nograph -log $CDS_LOG_PATH/CDS.$USER.`date '+20%y%m%d%h%s'`.$HOST-ocean.log -replay \!* '
+   else   
+      alias  cadr   'cdwa; virtuoso -nograph -log $CDS_LOG_PATH/CDS.$USER.`date '+20%y%m%d%h%s'`.$HOST-ocean.log -replay \!* '
    endif
 
 
@@ -26,7 +32,7 @@
    alias  sim   'cdwa; ocean < $DAISYSIM/ocean/\!*'
    alias  oo    'soffice \!* &'
    alias  o     'xterm -e osean \!* & '
-   alias  ol    'xterm -e osean  `ls -t | head -n 1` & '
+   alias  ol    'xterm -e osean  `ls -t *ocn | head -n 1` & '
    alias src    'source ~/.tcshrc'
 
    alias hitta  'find . -follow -iname \!*'

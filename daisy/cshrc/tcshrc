@@ -16,12 +16,15 @@ if ( ! ($?CDSDATABASE) ) then
    setenv CDSDATABASE "cds"	
 endif
 
-setenv DAISYAREA /site/edu/es/DAISY/daisy/
+# Include DAISYAREA from configuration
+source `/bin/dirname $0`/../bin/config.sh
+
 setenv PATH ${PATH}:${DAISYAREA}/bin/
 setenv USERAREA $WORKAREA/work_$USER/
 setenv VERAREA $USERAREA/pv
 setenv CDSSIMPATH $USERAREA/sim  # This should change name to DAISYSIM
 setenv DAISYSIM $USERAREA/sim
+
 
 #################################################
 # Generic cadence path setups
@@ -96,7 +99,7 @@ umask 0007
 #############################################
 
 # Add a check for user type
-setenv EMAIL $USER@student.liu.se
+setenv EMAIL $USER@$EMAILDOMAIN
 
 #############################################
 ## RUN USER SPECIFIC TCSHRC
