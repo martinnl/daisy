@@ -1213,11 +1213,11 @@
 	(progn
 	  (setq cellId (dbOpenCellViewByType cellView->lib->name cellView->cell->name "layout" nil "a"))
 	  (if cellView->shapes
-	      (if (member "prBoundary" cellView->shapes~>layerName)
+	      (if (or (member "prBoundary" cellView->shapes~>layerName) (member "PHL" cellView->shapes~>layerName))
 		  (progn 
 		    (foreach shah  cellView->shapes
-			     (if (and (equal shah->objType "rect") 
-				      (equal shah->lpp (list "prBoundary" "drawing")))
+			     (if (and (or (equal shah->objType "rect")  (equal shah->objType "polygon") )
+				      (or (equal shah->lpp (list "prBoundary" "drawing")) (equal shah->lpp (list "PHL" "BOUNDMK"))))
 				 (progn
 				   (printf "Adding instance and prBoundary:by rectangles to the layout of %s in %s. \n"  
 					   cellView->cell->name    

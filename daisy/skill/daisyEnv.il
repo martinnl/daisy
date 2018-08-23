@@ -115,7 +115,7 @@
 
 ;; Project specific corners and simulator options
 
-(envSetVal "spectre.opts"      "temp"       'string   "70")
+(envSetVal "spectre.opts"      "temp"       'string   "27")
 (envSetVal "spectre.opts"      "gmin"       'string   "1e-15")
 
 ;; To guarantee that the parametric analysis netlists properly

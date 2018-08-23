@@ -38,7 +38,7 @@
 		'header           nil
 		'plotterType      "postscript1"
 		'papersize        "A3"
-		'plotter          "Encapsulated Color Postscript (600 dpi)"
+		'plotter          "Encapsulated Color Postscript (1200 dpi)"
 		'plotToFile       t
 		'display          "display"
 		'outputfile     (strcat (setq outFileNameTemp 
@@ -55,8 +55,8 @@
 		'mailto           (getShellEnvVar "EMAIL")
 		'mail             t 
 		'orientation      "portrait"
-		'plotsize         (list 200.0 290.0)
-		'offset           (list 0.0 0.0)
+		'plotsize         (list 190.0 270.0)
+		'offset           (list -10.0 -10.0)
 		'unit             "mm"
 		'gridMultiple     5
 		'gridSpacing      1.000000
@@ -112,8 +112,8 @@
 			   (list 32 32) 
 			   (list (car l_coords)-32 (cadr l_coords)-32)))
 
-	  (hiFlush)	  (hiZoomAbsoluteScale cw 0.9)
-	  (hiFlush)	  (hiZoomAbsoluteScale cw 0.9)
+	  (hiFlush)	  (hiZoomAbsoluteScale cw 0.8)
+	  (hiFlush)	  (hiZoomAbsoluteScale cw 0.8)
 	  
 	  )
       (progn

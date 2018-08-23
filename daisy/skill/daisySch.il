@@ -640,7 +640,7 @@
 	  (sh (sprintf nil  "%s/bin/daisyReportCdsUser.sh %s" 
 		       (getShellEnvVar "DAISYAREA") 
 		       fileName))
-	  (loadi (strcat "/tmp/" "daisyLockUser" ".il"))
+	  (loadi (strcat "/tmp/tmphome/" "daisyLockUser" ".il"))
 	  (sprintf nil "%s" LOCKUSER  ))
       "")))
 

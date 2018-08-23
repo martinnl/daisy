@@ -6,11 +6,11 @@
 
 (defun kT (@optional (T 27) (scale "C"))
   ;; Returns the kT constant
-  (let ((offset 271.2))
+  (let ((offset 273.15))
     
     (if (equal scale "K")
 	(setq offset 0))
-    (times 1.381e-23 (plus T offset))))
+    (times 1.38064852e-23 (plus T offset))))
 
 
 (defun kTC (cap @optional (T 27) (scale "C"))

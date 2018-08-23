@@ -215,12 +215,13 @@
 	 (operationMargin 0)
 	 (selectedObjects (geGetSelectedSet))
 	 (l_transistors  (list "nch" "nch_25" "pch_25" "pmos4" "nmos4" "nmos1v" "pmos1v" "nmos1v_lvt" "pmos1v_lvt"
-			       "P_33_MM" "P_18_MM" "N_33_MM" "N_18_MM"
+			       "P_33_MM" "P_18_MM" "N_33_MM" "N_18_MM" "N_25_LL" "P_25_LL"
+			       "nch_elvt" "pch_elvt" 
 			       "nsvt25rf" "psvt25rf" "nsvtrf" "psvtrf"
 			       "nsvt25" "psvt25" "nsvt" "psvt"
 			       			       "nsvt33" "psvt33" 
 			       		"phvtlprpo" "nhvtlprpo"
-
+					"N_11_SPRVT" "P_11_SPRVT"
 			       "nhvt25" "phvt25" "nhvt" "phvt"
 			       "nlvt25" "plvt25" "nlvt" "plvt"
 			       "nch_33" "nch_33_dnw" "nch_33_dnwx" "nch_33x" "nch_dnw" "nch_dnwx" "nch_hvt" 
@@ -389,6 +390,9 @@
     cornerList))
 
 (defun returnCorner (cornerNo component cornerList)
+  ;; State the component, for example "mod" as in model to get
+  ;; the value for that particular setting/corner
+  ;; (returnCorner 1 "vccr" cornerList)
   (cadr (assoc component (cadr (assoc cornerNo cornerList)))))
 
 (defun returnCornerState  (cornerNo cornerList)
@@ -429,7 +433,7 @@
   (let ((cornerHeader (list))
 	(cornerNoList (list)))
     ;; Find the header
-    (printf "  ")
+    (printf "   ")
     (foreach subComponent (cadr (assoc (if (listp cornerNo) (car cornerNo) cornerNo) cornerList))
 	     (setq cornerHeader (append cornerHeader (list (car subComponent))))
 	     (printf "%9s " (car subComponent)))
@@ -515,7 +519,7 @@
    (strcat (getShellEnvVar "DAISYAREA") 
 	   "/pdkSpecific/"
 	   (getShellEnvVar "CDSPROCESSNAME")
-	   "/simulation/corners/daisyCorners_compact.csv")))
+	   "/sim/corners/daisyCorners_compact.csv")))
 
 (defun daisyOpenSimResFile (desLib desCell simTag)
   ;; Instead of creating a dummy name, one could increase the revision 
@@ -658,7 +662,7 @@
 		(getShellEnvVar "DAISYAREA") 
 		"/pdkSpecific/"
 		(getShellEnvVar "CDSPROCESSNAME")
-		"/simulation/corners/daisyCorners_compact.csv"))))
+		"/sim/corners/daisyCorners_compact.csv"))))
     (if (not session) 
 	(setq session (asiGetCurrentSession)))  
  
@@ -768,10 +772,12 @@
 	 (selectedObjects (geGetSelectedSet))
 	 (l_transistors  
 	  (list "nch" "nch_25" "pch_25" "pmos4" "nmos4" "nmos1v" "pmos1v" "nmos1v_lvt" "pmos1v_lvt"
-		"P_33_MM" "P_18_MM" "N_33_MM" "N_18_MM"
+		"P_33_MM" "P_18_MM" "N_33_MM" "N_18_MM" "P_25_LL" "N_25_LL"
+					"N_11_SPRVT" "P_11_SPRVT"
 		"nsvt25rf" "psvt25rf" "nsvtrf" "psvtrf"
 		"nsvt25" "psvt25" "nsvt" "psvt"
 		"nsvt33" "psvt33"
+		"nch_elvt" "pch_elvt"
 		"nsvtlp" "psvtlp"
 		"phvtlprpo" "nhvtlprpo"
 		"nsvtgp" "psvtgp"
@@ -923,4 +929,10 @@
 	      (view fileName nil (strcat "Operation Regions -- " (getCurrentTime) " -- " (getCurrentWindow)-> cellView -> cellName))
 	      (deleteFile fileName))
 	  (error "Couldn't open output file")))) ))
+
+
+(defun daisyUpdateCornerNumber (number)
+  (asiGetEnvOption (asiGetCurrentSession) "modelFiles")->value = 
+  (list (list "/site/edu/es/DAISY/daisy/pdkSpecific/umc065/sim/corners/corners.scs" (sprintf nil "%d" (int number))))
+  (int number))
 

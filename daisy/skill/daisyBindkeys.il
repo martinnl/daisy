@@ -55,9 +55,9 @@
      (daisySetBindKey  "Schematics" "Ctrl<Key>3"  "(daisyPresentRegionsPopUp)" "Given simulation results, the transistor operation regions are displayed in pop-up window")
      (daisySetBindKey  "Schematics" "Ctrl<Key>4"  "(asiValidVoltLevelp 1.6)" "Given simulation results, transistor violating a 1.6-V gate-to-drain/source limit are indicated")
      (daisySetBindKey  "Schematics" "Ctrl<Key>5"  "(asiAnnotateNetVoltage)" "Given simulation results, net voltages are printed.")
+     (daisySetBindKey  "Schematics" "Shift<Key>r" "(foreach label (setof x (geGetSelSet)~>theLabel x) (foreach strCmd (parseString label \"\n\") (printf \"--> %s \n \" strCmd)))")
 
-     
-
+  
      (daisySetBindKey  "Schematics" "<Key>1"  "sevNetlistAndRun((asiGetCurrentSession)->data -> sevSession)" "Runs the simulation.")
      (daisySetBindKey  "Schematics" "<Key>2"  "sevDirectPlot((asiGetCurrentSession)->data -> sevSession 'asiDirectPlotResultsMenuCB)" "Opens the main form for plotting results.")
      (daisySetBindKey  "Schematics" "<Key>4"  "daisyOpenHyperLink((car (geGetSelSet)))" "Opens a web browser with the hyperlink found in a label/text box.")

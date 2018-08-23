@@ -1,0 +1,19 @@
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;; GUI builder information ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ocnmRegGUIBuilder(
+ '(nil
+  function abCreateMovingAvgForm
+  name abCreateMovingAvgForm
+  description "abCreateMovingAvgForm"
+  category ("Custom Functions")
+  analysis (nil
+      general (nil
+        args ()
+          params(nil
+          )
+        inputrange t
+      )
+  )
+  outputs(result)
+ )
+)
