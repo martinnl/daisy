@@ -13,5 +13,7 @@ prepared for troubleshooting.
 2. Set DAISYAREA to the path you cloned to in daisy/cshrc/tcshrc.
 
 In order to use the daisyLayoutAssist run:
-> git submodule update
-> git clone --recursive
+```console
+$ git submodule update
+$ git clone --recursive
+```
