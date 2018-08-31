@@ -24,7 +24,7 @@ else
 if (-e  $PROJAREA/daisyProjSetup/info/daisyDdcs.txt) then 
     foreach line (`cat $PROJAREA/daisyProjSetup/info/daisyDdcs.txt`)
          echo "Generating the libs for $line"
-	 daisyGenDdcSubdirs.sh $line
+	 ${DAISYAREA}/bin/daisyGenDdcSubdirs.sh $line
     end
 else
     echo "There is no daisyDdcs.txt file in your daisyProjSetup/info"
