@@ -25,8 +25,7 @@
   		'runDir	(strcat (getShellEnvVar "USERAREA") "/log/")))
 
 (if (boundp 'cdlOutKeys)
-    cdlOutKeys->incFILE = (strcat (getShellEnvVar "DAISYAREA") 
-				  "/pdkSpecific/"
+    cdlOutKeys->incFILE = (strcat (getShellEnvVar "PDKSPECIFIC")
 				  (getShellEnvVar "CDSPROCESSNAME")
 				  "/pv/source_added")
     )
@@ -44,8 +43,7 @@
 
 
 (when (boundp 'mgc_eview_globals)
-    mgc_eview_globals -> cellMapFile =  (strcat (getShellEnvVar "DAISYAREA") 
-						"/pdkSpecific/"
+    mgc_eview_globals -> cellMapFile =  (strcat (getShellEnvVar "PDKSPECIFIC")
 						(getShellEnvVar "CDSPROCESSNAME")
 						"/pv/calview.cellmap")
     mgc_eview_globals -> parasiticViewScale = 1.0

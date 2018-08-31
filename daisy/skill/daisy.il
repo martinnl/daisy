@@ -68,8 +68,7 @@
 
 ;; PROCESS SPECIFIC SKILL FILES
 
-(loadi (strcat (getShellEnvVar "DAISYAREA") 
-	       "/pdkSpecific/" 
+(loadi (strcat (getShellEnvVar "PDKSPECIFIC")
 	       (getShellEnvVar "CDSPROCESSNAME")
 	       "/skill/pdk.il"))
 

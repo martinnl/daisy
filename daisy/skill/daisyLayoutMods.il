@@ -494,7 +494,7 @@
 (defun daisyReshapeTran (objId action)
   ;; This is just a template function and should be process dependent. 
   ;; In the end, it is going to be overwritten by same function name
-  ;; in the $DAISYAREA/pdkSpecific/$CDSPROCESSNAME/skill/... 
+  ;; in the $PDKSPECIFIC/$CDSPROCESSNAME/skill/... 
   ;; 
   (let ((noFingers 0) (totalWidth 0) (fingerWidth 0))
 

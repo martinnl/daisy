@@ -500,8 +500,7 @@
        (list  (if modelsPtr modelsPtr 
 		
 		(strcat 
-		 (getShellEnvVar "DAISYAREA") 
-		 "/pdkSpecific/" 
+		 (getShellEnvVar "PDKSPECIFIC")
 		 (getShellEnvVar "CDSPROCESSNAME") 
 		 "/models/"
 		 "toplevel.scs")
@@ -516,8 +515,7 @@
   ;; This list should probably also depend on the project in the
   ;; future.
   (daisyTraverseCornerFile 
-   (strcat (getShellEnvVar "DAISYAREA") 
-	   "/pdkSpecific/"
+   (strcat (getShellEnvVar "PDKSPECIFIC")
 	   (getShellEnvVar "CDSPROCESSNAME")
 	   "/sim/corners/daisyCorners_compact.csv")))
 
@@ -584,8 +582,7 @@
 	(setq cornerList
 	      (daisyTraverseCornerFile 
 	       (strcat 
-		(getShellEnvVar "DAISYAREA") 
-		"/pdkSpecific/"
+		(getShellEnvVar "PDKSPECIFIC")
 		(getShellEnvVar "CDSPROCESSNAME")
 		"/sim/corners/daisyCorners_compact.csv"))))
     
@@ -659,8 +656,7 @@
 	(setq cornerList
 	      (daisyTraverseCornerFile 
 	       (strcat 
-		(getShellEnvVar "DAISYAREA") 
-		"/pdkSpecific/"
+		(getShellEnvVar "PDKSPECIFIC")
 		(getShellEnvVar "CDSPROCESSNAME")
 		"/sim/corners/daisyCorners_compact.csv"))))
     (if (not session) 

@@ -8,5 +8,6 @@
 #
 
 read -r -a Words <<< `cat "$1" | grep LoginName`
+mkdir -p /tmp/tmphome
 echo "(setq LOCKUSER '${Words[1]})" > /tmp/tmphome/daisyLockUser.il
 

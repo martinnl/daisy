@@ -4,7 +4,7 @@
 # Rename to config.sh and place in /bin for it to take effect
 # //MNL
 
-setenv DAISYAREA /site/edu/es/DAISY
-setenv PDKSPECIFIC $DAISYAREA/pdkSpecific
+setenv DAISYAREA /site/edu/es/DAISY/
+setenv PDKSPECIFIC $DAISYAREA/pdkSpecific/
 
 setenv EMAILDOMAIN=student.liu.se
