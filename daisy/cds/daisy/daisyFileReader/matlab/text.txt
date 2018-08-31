@@ -1,6 +1,0 @@
-;; Try something like this in matlab:
-
-integerVector = 1:100;
-fileId = open('/some/file/name');
-fprintf(fileId, '%d\n', integerVector);
-close(fileId);
