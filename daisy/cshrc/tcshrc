@@ -17,7 +17,7 @@ if ( ! ($?CDSDATABASE) ) then
 endif
 
 # Include DAISYAREA from configuration
-source `/bin/dirname $0`/../bin/config.sh
+source $DAISYAREA/bin/config.sh
 
 setenv PATH ${PATH}:${DAISYAREA}/bin/
 setenv USERAREA $WORKAREA/work_$USER/
@@ -76,11 +76,11 @@ source $DAISYAREA/cshrc/daisyAliases
 
 #################################################
 ## RUN PROCESS SPECIFIC TCSHRC 
-## (EVENTUALLY MOVE TO PROJECT SETUP!!!)
+## TODO (EVENTUALLY MOVE TO PROJECT SETUP!!!)
 #################################################
 
 ## RUN PROCESS SPECIFIC TCSHRC
-setenv PDK_HOME $DAISYAREA/pdkSpecific/$CDSPROCESSNAME/
+setenv PDK_HOME $PDKSPECIFIC/$CDSPROCESSNAME/
 source $PDK_HOME/cshrc/tcshrc
 setenv MODELPATH $PDK_HOME/models/
 

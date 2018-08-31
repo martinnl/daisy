@@ -16,8 +16,8 @@ if ($# >= 2) then
 
 mkdir -p $ddcOaPath
 cd $ddcOaPath
-cat $DAISYAREA/pdkSpecific/$CDSPROCESSNAME/oa/tech.lib >> $ddcOaPath/cds.lib
-cat $DAISYAREA/pdkSpecific/$CDSPROCESSNAME/cds/tech.lib >> $ddcCdsPath/$cdsName
+cat $PDKSPECIFIC/$CDSPROCESSNAME/oa/tech.lib >> $ddcOaPath/cds.lib
+cat $PDKSPECIFIC/$CDSPROCESSNAME/cds/tech.lib >> $ddcCdsPath/$cdsName
 
 cdb2oa  -ignorelocks -nodm -lib $libName  -cdslibpath   $ddcCdsPath/$cdsName  
 	

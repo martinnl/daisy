@@ -1,6 +1,6 @@
 #!/bin/tcsh
 
-set dirs=$PDKSPECIFIC/pdkSpecific/*
+set dirs=$PDKSPECIFIC/*
 
 foreach dir ($dirs)
   basename $dir

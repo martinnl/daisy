@@ -27,6 +27,7 @@ echo "LVS IGNORE PORTS NO"                                >> $CMDRUNFILE
 echo "// END OF HEADER"                                   >> $CMDRUNFILE
 
 # Merge local data with master template    
+# TODO Fix with config file
 cat $WORKAREA/daisy/pdkSpecific/$CDSPROCESSNAME/verification/calibre.batch.lvs >> $CMDRUNFILE
 
 calibre -lvs -64 -hier -spice $LVSEXTFILE -hcell $HCELLSFILE $CMDRUNFILE  > $LVSLOGFILE 

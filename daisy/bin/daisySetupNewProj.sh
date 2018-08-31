@@ -12,7 +12,7 @@ if ($#argv != 4) then
   printf "  PROJPATH\t\tDirectory where the project directory will be created,\n\t\t\t  ie. the parent directory to the project directory.\n"
   printf "  PROJNAME\t\tName of the project. This will also be the name \n\t\t\t  of the project directory inside PROJPATH.\n" 
   printf "  GROUPNAME\t\tThis is the UNIX group name that will have full\n\t\t\t  access to the project.\n"
-  printf "  PROCESSNAME\t\tThe name of the process node to be used for this\n\t\t\t  project. A list of supported processes by daisy can\n\t\t\t  be found as subdirectories to the 'pdkSpecific'\n\t\t\t  directory in the daisy area.\n"
+  printf "  PROCESSNAME\t\tThe name of the process node to be used for this\n\t\t\t  project. A list of supported processes by daisy can\n\t\t\t  be found as subdirectories to the PDKSPECIFIC\n\t\t\t  directory.\n"
   exit
 endif
 
@@ -25,7 +25,7 @@ setenv PROCESS $4
 
 setenv PROJAREA ${PROJPATH}/${PROJNAME}
 set setuparea = ${PROJAREA}/daisyProjSetup
-setenv PDK_HOME ${DAISYAREA}/pdkSpecific/${PROCESS}
+setenv PDK_HOME ${PDKSPECIFIC}/${PROCESS}
 
 # DEBUG
 echo $PDK_HOME
