@@ -2,7 +2,7 @@
 #
 # Project setup for the daisy cad environment
 # J Jacob Wikner
-# Daniel Svärd
+# Daniel Svï¿½rd
 
 # Check for the correct number of arguments before we start to do anything.
 if ($#argv != 4) then
