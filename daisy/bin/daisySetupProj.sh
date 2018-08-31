@@ -38,17 +38,17 @@ cd "$WORKAREA"
 echo "$WORKAREA"
 
 # Linking the cadence setup files and dot files
-ln -sf $DAISYAREA/cds/cdsinit     .cdsinit
-ln -sf $DAISYAREA/cds/cdsenv      .cdsenv
-ln -sf $DAISYAREA/cds/cdsplotinit .cdsplotinit
-ln -sf $DAISYAREA/cds/assura_tech.lib       
-ln -sf $DAISYAREA/oceanrc         .oceanrc
-ln -sf $DAISYAREA/data.reg 
-ln -sf $DAISYAREA/hdl.var
+ln -sf $DAISYAREA/oa/cdsinit     .cdsinit
+ln -sf $DAISYAREA/oa/cdsenv      .cdsenv
+ln -sf $DAISYAREA/oa/cdsplotinit .cdsplotinit
+ln -sf $DAISYAREA/oa/assura_tech.lib       
+ln -sf $DAISYAREA/project_template/oceanrc         .oceanrc
+ln -sf $DAISYAREA/project_template/data.reg 
+ln -sf $DAISYAREA/project_template/hdl.var
 
 # Create local cds.lib so that Cadence don't complain that they don't exist
-touch "$USERAREA/cds/cds.lib"
-touch "$USERAREA/cds/cds.testlib"
+#touch "$USERAREA/cds/cds.lib"
+#touch "$USERAREA/cds/cds.testlib"
 touch "$USERAREA/oa/cds.lib"
 touch "$USERAREA/oa/cds.testlib"
 
@@ -58,7 +58,7 @@ ln -sf $DAISYAREA/cds/cdsinit     "$USERAREA/sim/ocean/.cdsinit"
 ln -sf $DAISYAREA/cds/cdsplotinit "$USERAREA/sim/ocean/.cdsplotinit"
 
 # Creating the cds.lib file
-echo 'INCLUDE $DAISYAREA/cds/$CDSDATABASE.lib' >! cds.lib
+echo 'INCLUDE $DAISYAREA/oa/$CDSDATABASE.lib' >! cds.lib
 
 # Write to the rc file in the $HOME to be sourced
 echo "# Setup for $PROJNAME" >! "$HOME/.${PROJNAME}_rc"

@@ -2,7 +2,7 @@
 #
 # Project setup for the daisy cad environment
 # J Jacob Wikner
-# Daniel Sv�rd
+# Daniel Svärd
 
 # Check for the correct number of arguments before we start to do anything.
 if ($#argv != 4) then
@@ -31,6 +31,7 @@ setenv PDK_HOME ${PDKSPECIFIC}/${PROCESS}
 echo $PDK_HOME
 echo $PROCESS
 # Create the project area
+# TODO Fix this - if it does not exist copy standard template
 umask 007
 mkdir -p ${PROJAREA}
 cp -r ${HOME}/cadence/daisyProjSetup.tmpl ${setuparea}
