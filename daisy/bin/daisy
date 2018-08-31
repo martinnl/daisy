@@ -1,0 +1,13 @@
+#!/bin/tcsh
+
+# TODO Create a wrapper for the other scripts
+# For example:
+# > daisy setup proj
+# > daisy generate project
+# > daisy generate ddcs
+# > daisy update ddcs
+# > daisy ddc add
+# > daisy ddc remove
+# > daisy pdk list
+# > daisy ddc list
+# > daisy .......
