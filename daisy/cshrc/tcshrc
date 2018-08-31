@@ -19,7 +19,7 @@ endif
 # Include DAISYAREA from configuration
 source $DAISYAREA/bin/config.sh
 
-setenv PATH ${PATH}:${DAISYAREA}/bin/
+setenv PATH ${PATH}:${DAISYAREA}/bin/:${DAISYAREA}/bin/shortcuts:${DAISYAREA}/bin/project
 setenv USERAREA $WORKAREA/work_$USER/
 setenv VERAREA $USERAREA/pv
 setenv CDSSIMPATH $USERAREA/sim  # This should change name to DAISYSIM
