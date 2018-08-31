@@ -19,7 +19,7 @@ setenv PROJAREA "$3"
 setenv WORKAREA "$PWD/$PROJPATH/$PROJNAME/"
 
 # Get DAISYAREA from config
-source `basename $0`/bin/config.sh
+source `dirname $0`/config.sh
 
 mkdir -p "$WORKAREA"
 

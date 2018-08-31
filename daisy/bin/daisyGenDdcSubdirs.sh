@@ -31,14 +31,16 @@ else
 	fi
 
         # --------------------------------
+        # TODO Fix this
         # This could be done a bit neater.
         # Maybe we should pick from a list of libraries
         # in the daisy area, rather than hardcoding it here.
+        # TODO Add possiblity to chose what should be created
         # --------------------------------
       
         # Do not overwrite existing lib /MNL 2015-06-08
         # Ignore check if we're creating local workarea
-        if [ -d "$TRGTAREA/$DDCNAME" ] && [ $TRGTAREA != $WORKAREA ]
+        if [ -d "$TRGTAREA/$DDCNAME" ] && [ "$TRGTAREA" != "$WORKAREA" ];
         then
           echo "DAISY:: Libs for $DDCNAME already exists."
         else

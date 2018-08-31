@@ -17,7 +17,7 @@ if ($#argv != 4) then
 endif
 
 # Get DAISYAREA from config
-source `basename $0`/bin/config.sh
+source `dirname $0`/config.sh
 setenv PROJPATH $1
 setenv PROJNAME $2
 setenv GROUP $3
