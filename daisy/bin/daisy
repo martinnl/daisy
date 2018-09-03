@@ -1,4 +1,4 @@
-#!/bin/tcsh
+#!/usr/bin/env python
 
 # TODO Create a wrapper for the other scripts
 # For example:
@@ -11,3 +11,41 @@
 # > daisy pdk list
 # > daisy ddc list
 # > daisy .......
+#
+
+import argparse
+
+def pdkFuncs(args):
+  print("pdkFuncs")
+  print(args)
+
+def ddcFuncs(args):
+  print("ddcFuncs")
+  print(args)
+
+  parser = argparse.ArgumentParser()
+  parser.add_argument("cmd", help="command to be performed")
+  newargs = parser.parse_args(args[1])
+  print(newargs)
+
+def main():
+  print("Welcome to daisy")
+  parser = argparse.ArgumentParser()
+  parser.add_argument("-v", "--verbose", help="increase output verbosity",
+                          action="store_true")
+
+  subparsers = parser.add_subparsers(help='sub-command help')
+
+  parser_pdk = subparsers.add_parser('pdk', help="access pdk      commands")
+  parser_pdk.set_defaults(func=pdkFuncs)
+
+  parser_ddc = subparsers.add_parser('ddc', help="access ddc commands")
+  parser_ddc.set_defaults(func=ddcFuncs)
+  
+  args = parser.parse_known_args()
+  print(args)
+  args[0].func(args)
+
+if __name__ == "__main__":
+  main()
+
