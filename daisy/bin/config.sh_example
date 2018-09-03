@@ -5,6 +5,7 @@
 # //MNL
 
 setenv DAISYAREA /site/edu/es/DAISY/
+setenv DAISYDEFAULTTEMPLATE $DAISYAREA/../daisyProjSetup.tmpl
 setenv PDKSPECIFIC $DAISYAREA/pdkSpecific/
 
 setenv EMAILDOMAIN=student.liu.se
