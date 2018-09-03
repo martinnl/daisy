@@ -3,6 +3,11 @@
 # Update DDCs defined in daisyProjSetup/info/daisyDdcs.txt
 # Martin Nielsen-Lönn 2015-06-08
 
+if ($# < 1) then
+then
+    setenv PROJAREA $1
+fi
+
 # Check that the project is loaded
 if (! ($?PROJAREA) ) then
   echo "PROJAREA not set, you have probably not sourced the project"

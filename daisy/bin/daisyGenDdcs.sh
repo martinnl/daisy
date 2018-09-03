@@ -9,6 +9,8 @@
 # J Jacob Wikner, Jacob.Wikner@LiU.se
 #
 
+# TODO Inspect
+
 if ($# < 1) then
     # Assume $PROJAREA is set    
 else     

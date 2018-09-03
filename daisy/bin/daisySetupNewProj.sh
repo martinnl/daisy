@@ -4,6 +4,8 @@
 # J Jacob Wikner
 # Daniel Svärd
 
+# TODO Inspect
+
 # Check for the correct number of arguments before we start to do anything.
 if ($#argv != 4) then
   printf "Usage: %s PROJPATH PROJNAME GROUPNAME PROCESSNAME\n" `basename $0`
@@ -17,7 +19,7 @@ if ($#argv != 4) then
 endif
 
 # Get DAISYAREA from config
-source `dirname $0`/config.sh
+source ${DAISYAREA}/bin/config.sh
 setenv PROJPATH $1
 setenv PROJNAME $2
 setenv GROUP $3
@@ -27,20 +29,30 @@ setenv PROJAREA ${PROJPATH}/${PROJNAME}
 set setuparea = ${PROJAREA}/daisyProjSetup
 setenv PDK_HOME ${PDKSPECIFIC}/${PROCESS}
 
-# DEBUG
-echo $PDK_HOME
-echo $PROCESS
+if ( -e ${PROJAREA} ) then
+  printf "Directory %s already exists. Use a non-existing directory.\n" ${PROJAREA} > /dev/stderr
+  exit -1
+endif
+
 # Create the project area
 # TODO Fix this - if it does not exist copy standard template
 umask 007
 mkdir -p ${PROJAREA}
-cp -r ${HOME}/cadence/daisyProjSetup.tmpl ${setuparea}
+if ( -e ${HOME}/cadence/daisyProjSetup.tmpl ) then
+  cp -r ${HOME}/cadence/daisyProjSetup.tmpl ${setuparea}
+else
+  cp -r ${DAISYDEFAULTTEMPLATE} ${setuparea}
+endif
 
 # Fix the project settings
 : >! ${setuparea}/cshrc/tcshrc # Truncate tcshrc file
 echo "setenv CDSPROCESSNAME ${PROCESS}" >> ${setuparea}/cshrc/tcshrc
 echo "setenv GROUP ${GROUP}" >> ${setuparea}/cshrc/tcshrc
 echo "setenv PROJAREA ${PROJAREA}" >> ${setuparea}/cshrc/tcshrc
+
+# Set project specific DDC top
+: >! ${setuparea}/info/daisyDdcs.txt # Truncate daisyDdcs file
+echo "${PROJNAME}Top" >> ${setuparea}/info/daisyDdcs.txt
 
 # Copy in the pdk specific daisyProjSetupAdd.sh
 if ( -e ${PDK_HOME}/bin/daisyProjSetupAdd.sh ) then

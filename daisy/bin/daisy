@@ -1,51 +1,315 @@
 #!/usr/bin/env python
+from __future__ import print_function, unicode_literals
 
 # TODO Create a wrapper for the other scripts
 # For example:
-# > daisy setup proj
-# > daisy generate project
-# > daisy generate ddcs
-# > daisy update ddcs
+# > daisy project setup
+# > daisy workarea ??
+# > daisy ddc update
 # > daisy ddc add
 # > daisy ddc remove
-# > daisy pdk list
 # > daisy ddc list
 # > daisy .......
 #
+# DONE:
+# > daisy pdk list
+# 
+# TODO:
+# 
 
-import argparse
+import sys
+sys.path.insert(0, '/mnt/d/Projects/daisy/daisy/bin/python_packages')
 
-def pdkFuncs(args):
-  print("pdkFuncs")
-  print(args)
+import os
+import pwd
+import subprocess
+import click
+click.disable_unicode_literals_warning = True
+from PyInquirer import prompt, print_json
+import json
 
-def ddcFuncs(args):
-  print("ddcFuncs")
-  print(args)
+def check_envvar(envvar):
+  if envvar[0] == '$':
+    if envvar[1:] in os.environ:
+      envvar = os.environ[envvar[1:]]
+    else:
+      click.echo(envvar.upper()+" has to be defined or given using the --"+envvar[1:].lower()+" parameter.")
+      exit(-1)
+  return envvar
 
-  parser = argparse.ArgumentParser()
-  parser.add_argument("cmd", help="command to be performed")
-  newargs = parser.parse_args(args[1])
-  print(newargs)
+@click.group()
+@click.option('--workarea', default="$WORKAREA")
+@click.option('--daisyarea', default="$DAISYAREA")
+@click.option('--projarea', default="$PROJAREA")
+@click.pass_context
+def cli(ctx, workarea, daisyarea, projarea):
+  """This script is a redirector for the daisy shell scripts used to create projects, generate DDCs, lists PDKs and so on."""
+  ctx.obj = {}
+  ctx.obj['workarea'] = workarea
+  ctx.obj['daisyarea'] = check_envvar(daisyarea)
+  ctx.obj['projarea'] = projarea
 
-def main():
-  print("Welcome to daisy")
-  parser = argparse.ArgumentParser()
-  parser.add_argument("-v", "--verbose", help="increase output verbosity",
-                          action="store_true")
+@cli.group()
+@click.pass_context
+def pdk(ctx):
+  """handle PDKs"""
+  click.echo("pdk")
 
-  subparsers = parser.add_subparsers(help='sub-command help')
+@pdk.command("list")
+@click.pass_context
+def pdk_list(ctx):
+  """list PDKs"""
+  click.echo("Available PDKs:")
+  cmd = ctx.obj['daisyarea']+"/bin/daisyListPDKs.sh"
+  subprocess.call([cmd])
 
-  parser_pdk = subparsers.add_parser('pdk', help="access pdk      commands")
-  parser_pdk.set_defaults(func=pdkFuncs)
+pdk.add_command(pdk_list)
 
-  parser_ddc = subparsers.add_parser('ddc', help="access ddc commands")
-  parser_ddc.set_defaults(func=ddcFuncs)
+@cli.group()
+@click.pass_context
+def project(ctx):
+  """create projects"""
+  #ctx.obj['projarea'] = check_envvar(ctx.obj['projarea'])
+
+@project.command("setup")
+@click.option('--parentdir', default="", help="parent directory of project location")
+@click.option('--projectname', default="", help="name of the project")
+@click.option('--group', default="", help="group that should own the project")
+@click.option('--processname', default="generic", help="process name to use in the project")
+@click.option('--interactive', default=True, help="use interactive mode (Default)")
+@click.pass_context
+def project_setup(ctx, parentdir, projectname, group, processname, interactive):
+  """setup new project"""
+  click.echo("Starting to create a new project...")
   
-  args = parser.parse_known_args()
-  print(args)
-  args[0].func(args)
+  # Get available PDKs
+  cmd = ctx.obj['daisyarea']+"/bin/daisyListPDKs.sh"
+  p = subprocess.Popen([cmd],stdout=subprocess.PIPE)
+  available_pdks, err = p.communicate()
+  available_pdks = available_pdks.split()
+
+  if interactive:
+    questions = [
+        {
+            'type': 'input',
+            'name': 'parentdir',
+            'message': 'Parent directory:',
+            'default': '~/projects/shared/'
+        },
+        {
+            'type': 'input',
+            'name': 'projectname',
+            'message': 'Project name:',
+            'default': 'testproject'
+        },
+        {
+            'type': 'input',
+            'name': 'group',
+            'message': 'Group name:',
+            'default': pwd.getpwuid(os.getuid()).pw_name.decode('unicode-escape')
+        },
+        {
+            'type': 'list',
+            'choices': available_pdks,
+            'name': 'processname',
+            'message': 'Process:',
+        }
+    ]
+
+    answers = prompt(questions)
+    parentdir = answers['parentdir']
+    projectname = answers['projectname']
+    group = answers['group']
+    processname = answers['processname']
+  else:
+    # Check so all of them are set
+    if parentdir == "" or projectname == "" or group == "" or processname == "":
+      print("All parameters has to be defined.")
+      exit(-1)
+  
+  print("Creating project "+projectname+" at "+parentdir+" owned by "+group+" and using PDK "+processname+".")
+  
+  # Build command
+  cmd = [ctx.obj['daisyarea']+'/bin/daisySetupNewProj.sh', parentdir, projectname, group, processname]
+  p = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  res, err = p.communicate()
+
+  # TODO Handle output parameters ?
+  #print(res)
+
+  if err != "":
+    print("Errors encountered:")
+    print(err)
+    print("Exiting...")
+    exit(-1)
+  else:
+    print("No errors!")
+    print("Updating DDCs")
+
+    ctx.obj["projarea"] = parentdir+"/"+projectname
+    ctx.invoke(ddc_generate, ctx=ctx)
+    print("Run:")
+    #print("> export PROJAREA "+ctx.obj["projarea"])
+    print("> daisy --projarea "+ctx.obj["projarea"]+" workarea setup --initial")
+    print("to complete setup.")
+
+
+@project.command("info")
+@click.option('--json/--no-json', default=False, help="output JSON (Default: false)")
+@click.pass_context
+def project_info(ctx, json):
+  """get project information"""
+  ctx.obj['projarea'] = check_envvar(ctx.obj['projarea'])
+  tcshrc_path = ctx.obj['projarea']+'/daisyProjSetup/cshrc/tcshrc'
+  cmd = ['grep', 'GROUP', tcshrc_path]
+  p = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  res, err = p.communicate()
+  group = res.split()[2] # TODO Ugly hack :(
+  if err != "":
+    print("Errors encountered:")
+    print(err)
+    print("Exiting...")
+    return(-1)
+  else:
+    if not json:
+      click.echo("Project info:")
+      click.echo("Group: "+group)
+    else:
+      return {'group': group}
+
+project.add_command(project_info)
+project.add_command(project_setup)
+
+@cli.group()
+@click.pass_context
+def workarea(ctx):
+  """create or get information about workarea"""
+
+@workarea.command("info")
+@click.pass_context
+def workarea_info(ctx):
+  """information about the selected workarea"""
+  ctx.obj['workarea'] = check_envvar(ctx.obj['workarea'])
+  workarea = ctx.obj['workarea']
+  click.echo("Info about: "+workarea)
+
+@workarea.command("setup")
+@click.option('--initial/--no-initial', default=False, help="initialize project during setup (Default: false)")
+@click.option('--parentdir', default="", help="parent directory of project location")
+@click.option('--projectname', default="", help="name of the project")
+@click.option('--interactive', default=True, help="use interactive mode (Default)")
+@click.pass_context
+def workarea_setup(ctx, initial, parentdir, projectname, interactive):
+  """setup workarea for a project"""
+  ctx.obj['projarea'] = check_envvar(ctx.obj['projarea'])
+  click.echo("Initial?")
+  if initial:
+    click.echo("First init")
+  else:
+    click.echo("Normal workarea")
+
+  if interactive:
+    questions = [
+        {
+            'type': 'input',
+            'name': 'parentdir',
+            'message': 'Parent directory:',
+            'default': os.path.expanduser('~/projects/workarea/')
+        },
+        {
+            'type': 'input',
+            'name': 'projectname',
+            'message': 'Local project name:',
+            'default': 'testproject'
+        },
+        {
+            'type': 'input',
+            'name': 'projarea',
+            'message': 'Project area:',
+            'default': ctx.obj['projarea']
+        }        
+    ]
+
+    answers = prompt(questions)
+    parentdir = answers['parentdir']
+    projectname = answers['projectname']
+    ctx.obj['projarea'] = answers['projarea']
+  else:
+    # Check so all of them are set
+    if parentdir == "" or projectname == "" or ctx.obj['projarea'] == "":
+      print("All parameters has to be defined.")
+      exit(-1)
+  
+  #/site/edu/es/DAISY/bin/daisySetupProj.sh $LOCALPARENTDIR $NAME $PROJAREA
+  
+  print("Creating workarea for "+projectname+"("+ctx.obj["projarea"]+") at "+parentdir+".")
+  
+  # Build command
+  cmd = [ctx.obj['daisyarea']+'/bin/daisySetupProj.sh', parentdir, projectname, ctx.obj["projarea"]]
+  print(cmd)
+  p = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  res, err = p.communicate()
+
+  # TODO Handle output parameters ?
+  #print(res)
+
+  if err != "":
+    print("Errors encountered:")
+    print(err)
+    print("Exiting...")
+    exit(-1)
+  else:
+    print("No errors!")
+
+    if initial:
+      # TODO Fix formatting
+      cmd = [ctx.obj['daisyarea']+'/bin/daisyUpdateDdcs.sh', ctx.obj["projarea"]]
+      p = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+      res, err = p.communicate()
+      print(res)
+      print(err)
+      # echo " 7) run daisyOpen (after sourcing project rc file) to set group permissions on everything"
+      proj_info_res = ctx.invoke(project_info, json=True)
+      cmd = [ctx.obj['daisyarea']+'/bin/daisyOpen', ctx.obj["projarea"], proj_info_res['group']]
+
+      p = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+      res, err = p.communicate()
+      print(res)
+      print(err)
+
+workarea.add_command(workarea_setup)
+workarea.add_command(workarea_info)
+
+@cli.group()
+@click.pass_context
+def ddc(ctx):
+  """handle the DDCs in the project"""
+  click.echo("hej")
+  ctx.obj['projarea'] = check_envvar(ctx.obj['projarea'])
+
+@ddc.command("list")
+def ddc_list():
+  """List DDCs"""
+  click.echo("DDCs in project:")
+  cmd = ctx.obj['daisyarea']+"/bin/daisyListDdcs.sh"
+  subprocess.call([cmd])
+
+@ddc.command("generate")
+def ddc_generate(ctx):
+  """Generate DDCs"""
+  ctx.obj['projarea'] = check_envvar(ctx.obj['projarea'])
+  click.echo("Generating DDCs")
+  cmd = [ctx.obj['daisyarea']+"/bin/daisyGenDdcs.sh", ctx.obj['projarea']]
+  subprocess.call(cmd)
+
+ddc.add_command(ddc_list)
+ddc.add_command(ddc_generate)
+
+cli.add_command(project)
+cli.add_command(workarea)
+cli.add_command(pdk)
+cli.add_command(ddc)
 
 if __name__ == "__main__":
-  main()
+  cli()
 

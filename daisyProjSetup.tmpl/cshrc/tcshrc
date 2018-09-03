@@ -1,0 +1,3 @@
+setenv CDSPROCESSNAME <process name>
+setenv GROUP <project group>
+setenv PROJAREA <project directory>

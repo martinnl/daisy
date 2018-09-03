@@ -6,7 +6,11 @@
 # 2018-08-23: Retrive DAISYAREA from config
 #
 
-# Path to your local directory
+# TODO CRITICAL Do not overwrite existing directory
+
+echo $argv
+
+# Path to your directory
 setenv PROJPATH "$1"
 
 # Local project name
@@ -16,7 +20,8 @@ echo $PROJNAME
 # Shared project area
 setenv PROJAREA "$3"
 
-setenv WORKAREA "$PWD/$PROJPATH/$PROJNAME/"
+# Changed to absolute directory 2018-09-04
+setenv WORKAREA "$PROJPATH/$PROJNAME/"
 
 # Get DAISYAREA from config
 source `dirname $0`/config.sh
