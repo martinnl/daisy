@@ -1,0 +1,7 @@
+#!/bin/bash -f
+
+# TODO Check variable
+
+# TODO Install clicker and pyinquirer
+# pip install click -t $DAISYAREA/bin/python_packages
+# pip install pyinquirer -t $DAISYAREA/bin/python_packages

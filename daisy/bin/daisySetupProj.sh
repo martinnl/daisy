@@ -6,8 +6,6 @@
 # 2018-08-23: Retrive DAISYAREA from config
 #
 
-# TODO CRITICAL Do not overwrite existing directory
-
 echo $argv
 
 # Path to your directory
@@ -22,6 +20,13 @@ setenv PROJAREA "$3"
 
 # Changed to absolute directory 2018-09-04
 setenv WORKAREA "$PROJPATH/$PROJNAME/"
+
+# TODO CRITICAL Do not overwrite existing directory
+# Check if the folder is already existing and quit if it is
+if ( -d $WORKAREA ) then
+    echo "Folder $WORKAREA already exists."
+    exit -1
+endif
 
 # Get DAISYAREA from config
 source `dirname $0`/config.sh

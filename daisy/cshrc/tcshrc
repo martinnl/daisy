@@ -10,6 +10,7 @@
 ## align with the modules
 #################################################
 
+# TODO Where is CDSDATABASE set?
 if ( ! ($?CDSDATABASE) ) then
    echo "DAISY:: Going for cadence CDBA format (old cadence)"
    echo "DAISY:: probably you forgot to load module ..."

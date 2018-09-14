@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function, unicode_literals
 
-# TODO Create a wrapper for the other scripts
+# TODO List below!
 # For example:
 # > daisy project setup
 # > daisy workarea ??
@@ -14,10 +14,9 @@ from __future__ import print_function, unicode_literals
 # DONE:
 # > daisy pdk list
 # 
-# TODO:
-# 
 
 import sys
+# TODO Critical Fix path below based on $DAISYAREA?
 sys.path.insert(0, '/mnt/d/Projects/daisy/daisy/bin/python_packages')
 
 import os
@@ -202,12 +201,14 @@ def workarea_info(ctx):
 def workarea_setup(ctx, initial, parentdir, projectname, interactive):
   """setup workarea for a project"""
   ctx.obj['projarea'] = check_envvar(ctx.obj['projarea'])
+
   click.echo("Initial?")
   if initial:
     click.echo("First init")
   else:
     click.echo("Normal workarea")
-
+  
+  # TODO Insert default projectname to the name of the projarea
   if interactive:
     questions = [
         {
@@ -226,8 +227,8 @@ def workarea_setup(ctx, initial, parentdir, projectname, interactive):
             'type': 'input',
             'name': 'projarea',
             'message': 'Project area:',
-            'default': ctx.obj['projarea']
-        }        
+            'default': ctx.obj['projarea'].decode('unicode-escape')
+        }
     ]
 
     answers = prompt(questions)
@@ -246,7 +247,7 @@ def workarea_setup(ctx, initial, parentdir, projectname, interactive):
   
   # Build command
   cmd = [ctx.obj['daisyarea']+'/bin/daisySetupProj.sh', parentdir, projectname, ctx.obj["projarea"]]
-  print(cmd)
+  #print(cmd)
   p = subprocess.Popen(cmd,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
   res, err = p.communicate()
 
@@ -284,11 +285,11 @@ workarea.add_command(workarea_info)
 @click.pass_context
 def ddc(ctx):
   """handle the DDCs in the project"""
-  click.echo("hej")
   ctx.obj['projarea'] = check_envvar(ctx.obj['projarea'])
 
 @ddc.command("list")
-def ddc_list():
+@click.pass_context
+def ddc_list(ctx):
   """List DDCs"""
   click.echo("DDCs in project:")
   cmd = ctx.obj['daisyarea']+"/bin/daisyListDdcs.sh"
@@ -312,4 +313,3 @@ cli.add_command(ddc)
 
 if __name__ == "__main__":
   cli()
-
